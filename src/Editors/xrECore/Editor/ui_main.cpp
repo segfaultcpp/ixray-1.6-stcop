@@ -533,6 +533,8 @@ void TUI::Redraw()
 				}
 			}
 
+			RContext->CopyResource(RTCopy->pSurface, RT->pSurface);
+
 #ifndef DEBUG
 			try
 #endif

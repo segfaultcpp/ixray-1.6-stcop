@@ -6,7 +6,7 @@ function normal(shader, t_base, t_second, t_detail)
         :fog(false)
     shader:dx10texture("s_base", t_base)
     shader:dx10texture("s_distort",t_base)
-    shader:dx10texture("s_image","$user$rt_color")
+    shader:dx10texture("s_image","$user$rt_color_copy")
     
     shader:dx10sampler("smp_base")
     shader:dx10sampler("smp_linear")
