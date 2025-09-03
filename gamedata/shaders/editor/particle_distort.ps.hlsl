@@ -2,9 +2,11 @@
 
 struct v2p
 {
+    float4 hpos : SV_POSITION;
     float2 tc0 : TEXCOORD0; // base
     float4 proj : TEXCOORD1; // base
     float4 c : COLOR0; // diffuse
+    float fog : FOG;
 };
 
 // Pixel
