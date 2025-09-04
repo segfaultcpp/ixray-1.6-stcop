@@ -61,6 +61,8 @@ public:
 
 	ref_shader ShaderTerrain;
 
+	ref_shader ShaderEditor;
+
 	ref_texture texture_null;
 	Fmaterial m_CurrentMat;
 	Fmaterial m_DefaultMat;

@@ -368,6 +368,8 @@ void CEditorRenderDevice::_Create(IReader* F)
 
 	ShaderTerrain.create("editor_terrain");
 
+	ShaderEditor.create("editor_default");
+
 	//dx10BufferUtils::CreateConstantBuffer( &m_MaterialBuffer, sizeof( Fmaterial ) );
 	//dx10BufferUtils::CreateConstantBuffer( &m_LightBuffer, sizeof( Flight ) * MAX_EDITOR_LIGHT );
 
