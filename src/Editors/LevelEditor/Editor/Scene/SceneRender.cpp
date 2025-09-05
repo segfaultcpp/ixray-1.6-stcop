@@ -123,6 +123,8 @@ void EScene::Render( const Fmatrix& camera )
     mapRenderObjects.traverseRL		(object_StrictB2F_3);
     RENDER_SCENE_TOOLS				(3,true);
 
+    RContext->CopyResource(UI->RTCopy->pSurface, UI->RT->pSurface);
+
     // render snap
     RenderSnapList			();
 
