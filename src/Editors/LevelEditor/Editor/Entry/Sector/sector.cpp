@@ -144,10 +144,10 @@ void CSector::Render(int priority, bool strictB2F)
 			color2.set(sector_color.r*k2,sector_color.g*k2,sector_color.b*k2,1.f);
 			if (lt->m_Flags.is(ESceneSectorTool::flDrawSolid))
 			{
-				EDevice->SetShader(EDevice->ShaderEditor);
-				EDevice->SetRS(D3DRS_CULLMODE,D3DCULL_NONE);
 				for (SItemIt it=sector_items.begin();it!=sector_items.end();++it)
 				{
+					EDevice->SetShader(EDevice->ShaderEditor);
+					EDevice->SetRS(D3DRS_CULLMODE, D3DCULL_NONE);
 					it->object->GetFullTransformToWorld(matrix);
 					it->mesh->RenderSelection( matrix, 0, color.get() );
 					it->mesh->RenderEdge( matrix, 0, color2.get() );
