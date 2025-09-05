@@ -1,6 +1,0 @@
-<w>
-    <element_0 vs="stub_default" ps="stub_default_ma" fog="0" zread="1" zwrite="1">
-		<texture name="s_base" rt="t_base" />
-        <sampler name="smp_base" />
-    </element_0>
-</w>
