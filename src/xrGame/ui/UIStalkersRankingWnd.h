@@ -37,6 +37,7 @@ public:
 	CUIScrollView&			GetTopList			()			{return *UIList;}
 	void					ShowHumanInfo		(u16 id);
 	virtual void			Reset				();
+	virtual CUIWindow* ui_cast_window() { return this; }
 };
 
 class CUIStalkerRankingInfoItem :public CUIWindow, public CUISelectable
@@ -54,6 +55,8 @@ public:
 	void					Init			(CUIXml* xml, LPCSTR path, int idx);
 	virtual void			SetSelected		(bool b);
 	virtual bool			OnMouseDown		(int mouse_btn);
+	virtual CUIWindow* ui_cast_window() { return this; }
+	virtual CUISelectable* ui_cast_selectable() { return this; }
 };
 
 class CUIStalkerRankingElipsisItem :public CUIStalkerRankingInfoItem
@@ -63,4 +66,6 @@ public:
 					CUIStalkerRankingElipsisItem(CUIStalkersRankingWnd*);
 	virtual void			SetSelected		(bool b);
 	virtual bool			OnMouseDown		(int mouse_btn);
+	virtual CUIWindow* ui_cast_window() { return this; }
+	virtual CUISelectable* ui_cast_selectable() { return this; }
 };
