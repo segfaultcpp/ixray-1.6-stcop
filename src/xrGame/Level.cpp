@@ -1028,7 +1028,7 @@ void CLevel::make_NetCorrectionPrediction	()
 	
 	for (u32 i =0; i<m_dwNumSteps; i++)	
 	{
-		physics_world()->Step();
+		physics_world()->Step(fixed_step);
 
 		for	(OBJECTS_LIST_it AIt = pActors4CrPr.begin(); AIt != pActors4CrPr.end(); AIt++)
 		{
@@ -1049,7 +1049,7 @@ void CLevel::make_NetCorrectionPrediction	()
 	{
 		for (u32 i =0; i<lvInterpSteps; i++)	//second prediction "real current" to "future" position
 		{
-			physics_world()->Step();
+			physics_world()->Step(fixed_step);
 #ifdef DEBUG
 /*
 			for	(OBJECTS_LIST_it OIt = pObjects4CrPr.begin(); OIt != pObjects4CrPr.end(); OIt++)

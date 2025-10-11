@@ -394,7 +394,7 @@ bool ActivateBoxDynamic( IPHMovementControl* mov_control, bool character_exist, 
 
 		mov_control->character()->ApplyForce(0,ph_world->Gravity()*mov_control->character()->Mass(),0);
 		max_depth=0.f;
-		ph_world->Step();
+		ph_world->Step(fixed_step);
 		if(max_depth	<	resolve_depth) 
 		{
 			break;
@@ -417,7 +417,7 @@ bool ActivateBoxDynamic( IPHMovementControl* mov_control, bool character_exist, 
 			//EnableCharacter();
 			mov_control->character()->Enable();
 			mov_control->character()->ApplyForce(0,ph_world->Gravity()*mov_control->character()->Mass(),0);
-			ph_world->Step();
+			ph_world->Step(fixed_step);
 			ph_world->CutVelocity(max_vel,max_a_vel);
 			if(max_depth	<	resolve_depth) 
 			{

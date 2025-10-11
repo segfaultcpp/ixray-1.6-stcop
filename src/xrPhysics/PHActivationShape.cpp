@@ -285,7 +285,7 @@ bool	CPHActivationShape::	Activate							(const Fvector need_size,u16 steps,floa
 			for(int i=0;num_it>i;++i)
 			{
 				max_depth=0.f;
-				ph_world->Step();
+				ph_world->Step(fixed_step);
 				CHECK_POS(Position(),"pos after ph_world->Step()",false);
 				ph_world->CutVelocity(max_vel,max_a_vel);
 				CHECK_POS(Position(),"pos after CutVelocity",true);

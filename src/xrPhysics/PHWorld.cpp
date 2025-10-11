@@ -208,7 +208,7 @@ void CPHWorld::OnFrame()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CPHWorld::Step()
+void CPHWorld::Step(float DeltaTime)
 {
 	PROF_EVENT("CPHWorld::Step");
 #ifdef DEBUG
@@ -275,7 +275,7 @@ void CPHWorld::Step()
 		debug_output().DBG_ObjBeforePhTune( obj );
 #endif
 
-		obj->PhTune(fixed_step);
+		obj->PhTune(DeltaTime);
 
 #ifdef	DEBUG
 		debug_output().DBG_ObjeAfterPhTune( obj );
@@ -286,7 +286,7 @@ void CPHWorld::Step()
 	for(i_update_object=m_update_objects.begin();m_update_objects.end() != i_update_object;)
 	{	CPHUpdateObject* obj=(*i_update_object);
 		++i_update_object;
-		obj->PhTune(fixed_step);
+		obj->PhTune(DeltaTime);
 	}
 
 	Device.StatPhysics()->ph_core.Begin		();
@@ -320,7 +320,7 @@ void CPHWorld::Step()
 #ifdef	DEBUG
 		debug_output().DBG_ObjBeforeStep( obj );
 #endif
-		obj->IslandStep(fixed_step);
+		obj->IslandStep(DeltaTime);
 
 #ifdef	DEBUG
 		debug_output().DBG_ObjAfterStep( obj );
@@ -341,7 +341,7 @@ void CPHWorld::Step()
 		debug_output().DBG_ObjBeforePhDataUpdate( obj );
 #endif
 
-		obj->PhDataUpdate(fixed_step);
+		obj->PhDataUpdate(DeltaTime);
 
 #ifdef	DEBUG
 		debug_output().DBG_ObjAfterPhDataUpdate( obj );
@@ -354,7 +354,7 @@ void CPHWorld::Step()
 	{	
 		CPHUpdateObject* obj=*i_update_object;
 		++i_update_object;
-		obj->PhDataUpdate(fixed_step);
+		obj->PhDataUpdate(DeltaTime);
 	}
 
 #ifdef DEBUG
@@ -415,8 +415,7 @@ void CPHWorld::FrameStep(dReal step)
 	VERIFY(_valid(step));
 	step *= phTimefactor;
 
-	// compute contact joints and forces
-	u32 it_number;
+	u32 it_number = 1;
 	float frame_time = m_frame_time;
 	frame_time += step;
 
@@ -445,24 +444,20 @@ void CPHWorld::FrameStep(dReal step)
 		return;
 	}
 
-#ifdef DEBUG 
+#ifdef DEBUG
 	debug_output().DBG_DrawFrameStart();
 	debug_output().DBG_DrawStatBeforeFrameStep();
 #endif
 
 	b_processing = true;
-
-	if (ph_console::g_bDebugDumpPhysicsStep && it_number > 20)
-		Msg("!!!TOO MANY PHYSICS STEPS PER FRAME = %d !!!", it_number);
-
-	for (UINT i = 0; i < it_number; ++i)
-		Step();
-
+	Step(fixed_step * (float)it_number);
 	b_processing = false;
+
 #ifdef DEBUG
 	debug_output().DBG_DrawStatAfterFrameStep();
 #endif
 }
+
 
 void CPHWorld::AddObject(CPHObject* object)
 {

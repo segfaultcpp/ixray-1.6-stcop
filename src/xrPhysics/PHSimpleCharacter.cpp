@@ -1787,7 +1787,7 @@ bool CPHSimpleCharacter::UpdateRestrictionType(CPHCharacter* ach)
 		ach->Enable();
 		Enable();
 
-		ph_world->Step();
+		ph_world->Step(fixed_step);
 
 		if (restrictor_depth < resolve_depth)
 		{
