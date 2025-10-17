@@ -551,6 +551,10 @@ void CUIPdaWnd::DrawHint()
 	{
 		UIPdaContactsWnd->DrawHint();
 	}
+	else if (m_sActiveSection == "eptRankingGlobal")
+	{
+		pUIStalkersRankingWnd->DrawHint();
+	}
 	if (m_hint_wnd)
 		m_hint_wnd->Draw();
 }

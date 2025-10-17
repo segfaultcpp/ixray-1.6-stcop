@@ -9,6 +9,7 @@ class CUICharacterInfo;
 class CUIScrollView;
 class CUIXml;
 class CSE_ALifeTraderAbstract;
+class UIHint;
 
 class CUIStalkersRankingWnd: public CUIWindow
 {
@@ -17,9 +18,10 @@ public:
 			void			Init				();
 	virtual void			Show				(bool status);
 			void			ShowHumanDetails	();
+	virtual void			DrawHint			();
+	CUIFrameWindow*			UIInfoFrame;
 protected:
 	CUIFrameWindow*			m_background = nullptr;
-	CUIFrameWindow*			UIInfoFrame;
 	CUIFrameWindow*			UICharIconFrame;
 	CUIFrameLineWnd*		UIInfoHeader;
 	CUIFrameLineWnd*		UICharIconHeader;
@@ -38,6 +40,7 @@ public:
 	void					ShowHumanInfo		(u16 id);
 	virtual void			Reset				();
 	virtual CUIWindow* ui_cast_window() { return this; }
+	UIHint*						m_hint_wnd = nullptr;
 };
 
 class CUIStalkerRankingInfoItem :public CUIWindow, public CUISelectable
@@ -57,6 +60,9 @@ public:
 	virtual bool			OnMouseDown		(int mouse_btn);
 	virtual CUIWindow* ui_cast_window() { return this; }
 	virtual CUISelectable* ui_cast_selectable() { return this; }
+	virtual void				OnFocusReceive			();
+	virtual void				OnFocusLost				();
+			void				SetHintText				();
 };
 
 class CUIStalkerRankingElipsisItem :public CUIStalkerRankingInfoItem

@@ -14,6 +14,9 @@
 #include "../Actor.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "../../xrUI/UIHelper.h"
+#include "../../xrUI/Widgets/UIHint.h"
+#include "../../xrUI/UICursor.h"
+#include "../../xrEngine/string_table.h"
 
 #define		STALKERS_RANKING_XML			"stalkers_ranking.xml"
 #define		STALKERS_RANKING_CHARACTER_XML	"stalkers_ranking_character.xml"
@@ -79,8 +82,18 @@ void CUIStalkersRankingWnd::Init()
 
 	xml_init.InitAutoStaticGroup		(uiXml, "left_auto",	0,			UIInfoFrame);
 	xml_init.InitAutoStaticGroup		(uiXml, "right_auto",	0,			UICharIconFrame);
+
+	if (uiXml.NavigateToNode("hint_wnd"))
+	{
+		m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
+	}
 }
 
+void CUIStalkersRankingWnd::DrawHint()
+{
+	if (m_hint_wnd)
+		m_hint_wnd->Draw();
+}
 
 void CUIStalkersRankingWnd::Show(bool status)
 {
@@ -172,7 +185,8 @@ void CUIStalkersRankingWnd::AddActorItem(CUIXml* xml, int num, CSE_ALifeTraderAb
 {
 	string64							buff;
 	CUIStalkerRankingInfoItem*			itm;
-	if(num>19){
+	if(num > m_items_count-1)
+	{
 		itm								= new CUIStalkerRankingElipsisItem(this);
 		itm->Init						(xml, "item_ellipsis", 0);
 		UIList->AddWindow				(itm, true);
@@ -282,6 +296,41 @@ bool CUIStalkerRankingInfoItem::OnMouseDown		(int mouse_btn)
 		return true;
 	}else
 		return false;
+}
+
+void CUIStalkerRankingInfoItem::OnFocusReceive()
+{
+	CUIWindow::OnFocusReceive();
+
+	if (!m_StalkersRankingWnd->m_hint_wnd)
+		return;
+
+	if (!m_bCursorOverWindow)
+	{
+		m_StalkersRankingWnd->m_hint_wnd->set_text("");
+		return;
+	}
+	SetHintText();
+}
+
+void CUIStalkerRankingInfoItem::SetHintText()
+{
+	CSE_ALifeTraderAbstract* T = ch_info_get_from_id(m_humanID);
+
+	const char* hint = "";
+
+	luabind::functor<const char*> functorSetHint;
+	if (ai().script_engine().functor("pda.coc_rankings_set_hint", functorSetHint))
+		hint = functorSetHint(m_humanID);
+
+	m_StalkersRankingWnd->m_hint_wnd->set_text(hint);
+}
+
+void CUIStalkerRankingInfoItem::OnFocusLost()
+{
+	CUIWindow::OnFocusLost();
+	if (m_StalkersRankingWnd->m_hint_wnd)
+		m_StalkersRankingWnd->m_hint_wnd->set_text("");
 }
 
 CUIStalkerRankingElipsisItem::CUIStalkerRankingElipsisItem(CUIStalkersRankingWnd* w)
