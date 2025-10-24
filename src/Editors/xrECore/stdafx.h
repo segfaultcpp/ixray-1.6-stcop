@@ -3,9 +3,10 @@
 //----------------------------------------------------
 #pragma once
 // DirectX headers
-#include <d3d9.h>
+#include <d3d11.h>
+#include <d3d11shader.h>
 #include "../xrEUI/stdafx.h"
-#include "../../Layers/xrRenderDX9/xrD3DDefs.h"
+#include "../../Layers/xrRenderDX10/DXCommonTypes.h"
 
 #include "../../utils/xrDXT/xrDXT.h"
 
@@ -32,12 +33,11 @@
 
 #define DIRECTINPUT_VERSION 0x0800
 
-#define         R_R1    1
-#define         R_R2    2
-#define         RENDER  R_R1
-#define			REDITOR 1
-
-
+#define R_R1    1
+#define R_R2    2
+#define R_R4    4
+#define RENDER  R_R4
+#define REDITOR 1
 
 #define PropertyGP(a,b)	__declspec( property( get=a, put=b ) )
 #define THROW			FATAL("THROW");

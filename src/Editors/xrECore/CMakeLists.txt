@@ -38,7 +38,6 @@ file(GLOB_RECURSE ECORE_SOURCE_RES_FILES
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
-	"../../Layers/xrRenderDX9/dx9r_constants_cache.*"
 	"../../Layers/xrRender/Animation.*"
 	"../../Layers/xrRender/blenders/Blender.*"
 	"../../Layers/xrRender/blenders/Blender_Palette.*"
@@ -80,8 +79,6 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
 	"../../Layers/xrRender/FProgressive.*"
 	"../../Layers/xrRender/FSkinned.*"
 	"../../Layers/xrRender/FVisual.*"
-	"../../Layers/xrRenderDX9/dx9HW.*"
-	"../../Layers/xrRenderDX9/dx9HWCaps.*"
 	"../../Layers/xrRender/ModelPool.*"
 	"../../Layers/xrRender/ParticleEffect.*"
 	"../../Layers/xrRender/ParticleEffectDef.*"
@@ -90,8 +87,6 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
 	"../../Layers/xrRender/ResourceManager.*"
 	"../../Layers/xrRender/ResourceManager_Loader.*"
 	"../../Layers/xrRender/ResourceManager_Reset.*"
-	"../../Layers/xrRenderDX9/dx9ResourceManager_Resources.*"
-	"../../Layers/xrRenderDX9/dx9ResourceManager_Scripting.*"
 	"../../Layers/xrRender/R_Backend.*"
 	"../../Layers/xrRender/R_Backend_DBG.*"
 	"../../Layers/xrRender/R_Backend_hemi.*"
@@ -106,7 +101,6 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
 	"../../Layers/xrRender/SH_Matrix.*"
 	"../../Layers/xrRender/SH_Texture.*"
 	"../../Layers/xrRender/SH_RT.*"
-	"../../Layers/xrRenderDX9/DDSTextureLoader9.*"
 	"../../Layers/xrRender/SkeletonAnimated.*"
 	"../../Layers/xrRender/SkeletonCustom.*"
 	"../../Layers/xrRender/SkeletonRigid.*"
@@ -114,20 +108,26 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
 	"../../Layers/xrRender/RenderPhaseAccumPointGeom.*"
 	"../../Layers/xrRender/RenderPhaseAccumSpotGeom.*"
 	"../../Layers/xrRender/stats_manager.*"
-	"../../Layers/xrRenderDX9/dx9Texture.*"
 	"../../Layers/xrRender/TextureDescrManager.*"
 	"../../Layers/xrRender/tga.*"
 	"../../Layers/xrRender/tss_def.*"
 	"../../Layers/xrRender/xrRender_console.*"
-	"../../Layers/xrRenderPC_R1/Blender_Blur.*"
-	"../../Layers/xrRenderPC_R1/BlenderDefault.*"
-	"../../Layers/xrRenderPC_R1/Blender_default_aref.*"
-	"../../Layers/xrRenderPC_R1/Blender_LaEmB.*"
-	"../../Layers/xrRenderPC_R1/Blender_Model.*"
-	"../../Layers/xrRenderPC_R1/Blender_Screen_GRAY.*"
-	"../../Layers/xrRenderPC_R1/Blender_Shadow_World.*"
-	"../../Layers/xrRenderPC_R1/Blender_Vertex_aref.*"
-	"../../Layers/xrRenderPC_R1/Blender_Vertex.*"
+	
+    "../../Layers/xrRenderDX10/dx11XMLBlendCompiler.*"
+	"../../Layers/xrRenderDX10/dx11Texture.*"
+    "../../Layers/xrRenderDX10/dx11ResourceManager_Resources.*"
+    "../../Layers/xrRenderDX10/dx11ResourceManager_Scripting.*"
+    "../../Layers/xrRenderDX10/dx10BufferUtils.*"
+    "../../Layers/xrRenderDX10/dx10StateUtils.*"
+    "../../Layers/xrRenderDX10/dx10TextureUtils.*"
+    "../../Layers/xrRenderDX10/dx10ConstantBuffer.*"
+    "../../Layers/xrRenderDX10/Blender_Recorder_R3.cpp"
+	"../../Layers/xrRenderDX10/StateManager/*.*"
+    "../../Layers/xrRenderDX10/dx11HW.*"
+    "../../Layers/xrRenderDX10/dx11HWCaps.*"
+    "../../Layers/xrRenderDX10/dx10r_constants_cache.*"
+
+    "../../Layers/xrRenderPC_R4/R_Backend_LOD.cpp"
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_EXT_FILES CONFIGURE_DEPENDS
@@ -174,6 +174,7 @@ target_compile_definitions(xrECore PRIVATE _WINDOWS)
 target_compile_definitions(xrECore PRIVATE _USRDLL)
 target_compile_definitions(xrECore PUBLIC XR_EDITOR_NEW)
 target_compile_definitions(xrECore PUBLIC _EDITOR)
+target_compile_definitions(xrECore PUBLIC USE_DX11)
 
 target_compile_options(xrECore PRIVATE /W0)
 target_compile_definitions(xrECore PRIVATE "$<$<CONFIG:Debug>:DEBUG>")
@@ -190,12 +191,11 @@ target_link_libraries(xrECore PUBLIC xrPhysics)
 target_link_libraries(xrECore PUBLIC xrDXT)
 target_link_libraries(xrECore PUBLIC MagicFM)
 target_link_libraries(xrECore PUBLIC NvMender2003)
-target_link_libraries(xrECore PUBLIC "d3d9.lib")
+target_link_libraries(xrECore PUBLIC "d3d11.lib")
 target_link_libraries(xrECore PUBLIC "d3dcompiler.lib")
 
 target_link_libraries(xrECore PRIVATE Ogg::ogg)
 target_link_libraries(xrECore PRIVATE Vorbis::vorbis)
-#target_link_libraries(xrECore PRIVATE Vorbis::vorbisfile)
 target_link_libraries(xrECore PRIVATE OpenAL::OpenAL)
 
 target_validate_pch(xrECore ${CMAKE_CURRENT_SOURCE_DIR})

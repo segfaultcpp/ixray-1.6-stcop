@@ -67,11 +67,13 @@ public:
 		m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 	}
 
-	void reset_light_marker(bool bResetStencil = false) {
+	void reset_light_marker(bool bResetStencil = false)
+	{
 		dwLightMarkerID = 5;
 
-		if(bResetStencil) {
-			CHK_DX(RDevice->Clear(0L, nullptr, D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
+		if(bResetStencil)
+		{
+			GRHI->ClearDepthStencil(RCache.get_ZB(), ERHI_CLEAR_TARGET::STENCIL, 1.f, 0);
 		}
 	}
 

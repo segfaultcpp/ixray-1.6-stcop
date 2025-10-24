@@ -2,7 +2,8 @@
 
 #include "light.h"
 
-class	light_Package
+class light;
+class light_Package
 {
 public:
 	xr_vector<light*>		v_point;
