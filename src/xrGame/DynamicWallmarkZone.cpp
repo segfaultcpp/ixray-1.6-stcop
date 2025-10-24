@@ -87,13 +87,23 @@ void CDynamicWallmarkZone::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
     output_packet.w_u8(CurrentStatus);
+    output_packet.w_stringZ(shader);
+    output_packet.w_stringZ(texture);
+    output_packet.w_float(h);
+    output_packet.w_float(w);
+    output_packet.w_float(r);
 }
 
 void CDynamicWallmarkZone::load(IReader& input_packet)
 {
     inherited::load(input_packet);
-    CurrentStatus = input_packet.r_u8();
-    SwitchWallmark(CurrentStatus);
+    bool LocCurrentStatus = input_packet.r_u8();
+    input_packet.r_stringZ(shader);
+    input_packet.r_stringZ(texture);
+    h = input_packet.r_float();
+    w = input_packet.r_float();
+    r = input_packet.r_float();
+    SwitchWallmark(LocCurrentStatus);
 }
 
 void CDynamicWallmarkZone::SwitchWallmark(bool isOn)
