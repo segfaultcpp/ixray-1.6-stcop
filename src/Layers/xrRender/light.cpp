@@ -33,7 +33,7 @@ light::light()
 	ignore_object	= nullptr;
 	for (int f=0; f<6; f++)decor_object[f] = nullptr;
 
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if !defined(_EDITOR) && RENDER!=R_R1
 	ZeroMemory		(omnipart,sizeof(omnipart));
 	s_spot			= nullptr;
 	s_point			= nullptr;
@@ -51,17 +51,17 @@ light::light()
 
 light::~light	()
 {
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if !defined(_EDITOR) && RENDER!=R_R1
 	for (int f=0; f<6; f++)	xr_delete(omnipart[f]);
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
+#endif
 	set_active		(false);
 
 	// remove from Lights_LastFrame
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if !defined(_EDITOR) && RENDER!=R_R1
 	for (u32 it=0; it<RImplementation.Lights_LastFrame.size(); it++)
 		if (this==RImplementation.Lights_LastFrame[it])	RImplementation.Lights_LastFrame[it]=0;
 	m_sectors.clear();
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
+#endif
 	ignore_object	= nullptr;
 	for (int f=0; f<6; f++)decor_object[f] = nullptr;
 }
@@ -82,8 +82,8 @@ void light::destroy(bool deffered)
 }
 
 
-#if (RENDER==R_R2) || (RENDER==R_R4)
-void light::set_texture		(LPCSTR name)
+#if !defined(_EDITOR) && RENDER!=R_R1
+void light::set_texture(LPCSTR name)
 {
 	if ((0==name) || (0==name[0]))
 	{
@@ -102,18 +102,16 @@ void light::set_texture		(LPCSTR name)
 
 	s_volumetric.create		("accum_volumetric", name);
 }
-#endif
-
-#if RENDER==R_R1
-void light::set_texture		(LPCSTR name)
+#else
+void light::set_texture(LPCSTR name)
 {
 }
 #endif
 
-void light::set_shadow				(bool b)						
+void light::set_shadow(bool b)						
 { 
 	flags.bShadow=b;
-#if RENDER!=R_R1
+#if !defined(_EDITOR) && RENDER!=R_R1
 	if (flags.type==IRender_Light::POINT)
 	{
 		if(flags.bShadow)
@@ -193,7 +191,7 @@ void	light::set_rotation		(const Fvector& D, const Fvector& R)	{
 	if (!fsimilar(1.f, old_D.dotproduct(D),EPS_S))	spatial_move();
 }
 
-#if RENDER!=R_R1
+#if !defined(_EDITOR) && RENDER!=R_R1
 void light::get_sectors()
 {
 	if(RImplementation.SectorsCount()<=1) return;
@@ -273,7 +271,7 @@ void	light::spatial_move			()
 	// update spatial DB
 	ISpatialOwner::spatial_move();
 
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if !defined(_EDITOR) && RENDER!=R_R1
 	svis.invalidate();
 	get_sectors();
 #endif // (RENDER==R_R2) || (RENDER==R_R4)
@@ -299,7 +297,7 @@ Fvector	light::spatial_sector_point()
 }
 
 //////////////////////////////////////////////////////////////////////////
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if !defined(_EDITOR) && RENDER!=R_R1
 // Xforms
 void	light::xform_calc			()
 {

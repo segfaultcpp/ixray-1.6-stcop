@@ -28,8 +28,7 @@ UIMinimapEditorForm::~UIMinimapEditorForm()
 			IM_TEXTURE_RELEASE(element.Texture);
 	}
 
-	if (m_BackgroundTexture)
-		IM_TEXTURE_RELEASE(m_BackgroundTexture);
+	m_BackgroundTexture.destroy();
 
 	selectedElement = nullptr;
 
@@ -133,7 +132,7 @@ void UIMinimapEditorForm::RenderCanvas()
 	}
 
 	ImVec2 bg_display_size(m_BackgroundRenderSize.x * m_Zoom, m_BackgroundRenderSize.y * m_Zoom);
-	ImGui::GetWindowDrawList()->AddImage(m_BackgroundTexture, canvas_p0 + m_BackgroundPosition, canvas_p0 + m_BackgroundPosition + bg_display_size);
+	ImGui::GetWindowDrawList()->AddImage(m_BackgroundTexture->get_SRView()->GetRawSRV(), canvas_p0 + m_BackgroundPosition, canvas_p0 + m_BackgroundPosition + bg_display_size);
 
 	
 	for (int i = 0; i < elements.size(); i++) {
@@ -1149,15 +1148,11 @@ void UIMinimapEditorForm::SaveFile(bool saveCurrent)
 
 void UIMinimapEditorForm::Draw()
 {
-	if (m_TextureRemove)
-	{
-		IM_TEXTURE_RELEASE(m_TextureRemove);
-		m_TextureRemove = nullptr;
-	}
+	m_TextureRemove.destroy();
+
 	if (m_BackgroundTexture == nullptr)
 	{
-		u32 mem = 0;
-		m_BackgroundTexture = RImplementation.texture_load("ui\\ui_nomap", mem);
+		m_BackgroundTexture = EDevice->Resources->_CreateTexture("ui\\ui_nomap");
 		m_BackgroundTexturePath = "ui\\ui_nomap";
 		m_BackgroundSize.x = 512;
 		m_BackgroundSize.y = 512;
@@ -1270,26 +1265,27 @@ int UIMinimapEditorForm::LoadTexture(Element& el, const xr_string texture)
 		el.TexturePath = FS.fix_path(fn);
 	}
 
-	//el.path = fn;
 	el.FileSize.x = W;
 	el.FileSize.y = H;
 
-	ID3DTexture2D* pTexture = nullptr;
-	{
-		R_CHK(REDevice->CreateTexture(W, H, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
-		el.Texture = pTexture;
-		{
-			D3DLOCKED_RECT rect;
-			R_CHK(pTexture->LockRect(0, &rect, 0, D3DLOCK_DISCARD));
-			for (int i = 0; i < H; i++)
-			{
+	RHITextureDesc Desc;
+	Desc.Width = W;
+	Desc.Height = H;
+	Desc.Format = ERHI_FORMAT::R8G8B8A8_UNORM;
+	Desc.MipLevels = 1;
+	Desc.ArraySize = 1;
+	Desc.Usage = ERHI_USAGE::USAGE_DEFAULT;
+	Desc.BindFlags = ERHI_BIND_FLAG::SHADER_RESOURCE;
 
-				unsigned char* dest = static_cast<unsigned char*>(rect.pBits) + (rect.Pitch * i);
-				memcpy(dest, m_ImageData.data() + (W * i), sizeof(unsigned char) * W * 4);
-			}
-			R_CHK(pTexture->UnlockRect(0));
-		}
-	}
+	RHISubResource SubResource{};
+	SubResource.Width = W;
+	SubResource.Height = H;
+	SubResource.TextureFormat = Desc.Format;
+	SubResource.RowPitch = W * 4;
+	SubResource.Data = m_ImageData.data();
+
+	el.Texture = GRHI->CreateTexture2D(Desc, SubResource);
+
 
 	return 0;
 }
@@ -1332,23 +1328,25 @@ void UIMinimapEditorForm::LoadBGClick(const xr_string texture)
 		}
 
 		m_TextureRemove = m_BackgroundTexture;
-		ID3DTexture2D* pTexture = nullptr;
-		{
-			R_CHK(REDevice->CreateTexture(m_ImageW, m_ImageH, 1, 0, D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
-			m_BackgroundTexture = pTexture;
+		RHITextureDesc Desc;
+		Desc.Width = m_ImageW;
+		Desc.Height = m_ImageH;
+		Desc.Format = ERHI_FORMAT::R8G8B8A8_UNORM; // X8R8G8B8 в RHI представим как RGBA
+		Desc.MipLevels = 1;
+		Desc.ArraySize = 1;
+		Desc.Usage = ERHI_USAGE::USAGE_DEFAULT;
+		Desc.BindFlags = ERHI_BIND_FLAG::SHADER_RESOURCE;
 
-			{
-				D3DLOCKED_RECT rect;
-				R_CHK(pTexture->LockRect(0, &rect, 0, D3DLOCK_DISCARD));
-				for (int i = 0; i < m_ImageH; i++)
-				{
+		RHISubResource SubResource{};
+		SubResource.Width = m_ImageW;
+		SubResource.Height = m_ImageH;
+		SubResource.TextureFormat = Desc.Format;
+		SubResource.RowPitch = m_ImageW * 4; // 4 байта на пиксель
+		SubResource.Data = m_ImageData.data(); // данные уже в RGBA формате
 
-					unsigned char* dest = static_cast<unsigned char*>(rect.pBits) + (rect.Pitch * i);
-					memcpy(dest, m_ImageData.data() + (m_ImageW * i), sizeof(unsigned char) * m_ImageW * 4);
-				}
-				R_CHK(pTexture->UnlockRect(0));
-			}
-		}
+		auto Surface = GRHI->CreateTexture2D(Desc, SubResource);
+		m_BackgroundTexture->surface_set(Surface);
+		Surface->Release();
 	}
 	
 }

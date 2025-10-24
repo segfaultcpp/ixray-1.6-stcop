@@ -34,7 +34,7 @@ void CBackend::OnFrameBegin	()
 {
 	if (!g_dedicated_server)
 	{
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 		Invalidate();
 		//	DX9 sets base rt nd base zb by default
 		RImplementation.rmNormal();

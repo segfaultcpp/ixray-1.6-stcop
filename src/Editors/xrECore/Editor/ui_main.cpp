@@ -542,10 +542,12 @@ void TUI::Redraw()
 			RCache.set_RT(RSwapchainTarget);
 			RCache.set_ZB(RDepth);
 
+#if 0
 			RDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, 0);
 			RDevice->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, 0);
 			RDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 			RDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+#endif
 		}
 
 		EDevice->SetRS(D3DRS_FILLMODE, D3DFILL_SOLID);

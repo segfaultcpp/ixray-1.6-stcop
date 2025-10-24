@@ -151,8 +151,10 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 		R_ASSERT3(texDetailBumpX[0] && xr_strlen(texDetailBumpX), errorMsg, "Missing detail texture");
 	}
 
-#ifdef USE_DX11
-	if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0) {
+#if RENDER==R_R4
+#ifndef _EDITOR
+	if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
+	{
 		string256 hs = "tess", ds = "tess";
 
 		if (C.TessMethod == CBlender_Compile::TESS_PN || C.TessMethod == CBlender_Compile::TESS_PN_HM) {
@@ -192,6 +194,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 		C.r_Pass(vs, ps, FALSE, TRUE, FALSE);
 	}
 	else
+#endif
 	{
 		C.r_Pass(vs, ps, FALSE);
 	}
@@ -256,11 +259,11 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 #endif
 
 #ifdef _EDITOR
-	C.r_Sampler_clw("s_material", "shaders\\r2_material");
-	C.r_Sampler("env_s0", "$user$env_s0");
-	C.r_Sampler("env_s1", "$user$env_s1");
-	C.r_Sampler("sky_s0", "$user$sky0");
-	C.r_Sampler("sky_s1", "$user$sky1");
+	C.r_dx10Texture("s_material", "shaders\\r2_material");
+	C.r_dx10Texture("env_s0", "$user$env_s0");
+	C.r_dx10Texture("env_s1", "$user$env_s1");
+	C.r_dx10Texture("sky_s0", "$user$sky0");
+	C.r_dx10Texture("sky_s1", "$user$sky1");
 #endif
 
 	if (!DO_NOT_FINISH) {

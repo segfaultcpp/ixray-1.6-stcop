@@ -101,8 +101,8 @@ private:
 	ImVec2		m_BoundBackgroundPosition{ 0,0 };
 	Fvector4	m_Bound { 0,0,0,0};
 private:
-	ImTextureID					m_BackgroundTexture;
-	ImTextureID					m_TextureRemove;
+	ref_texture m_BackgroundTexture;
+	ref_texture m_TextureRemove;
 	//
 	ImVec2		m_BackgroundPosition;
 	ImVec2		m_BackgroundRenderSize;

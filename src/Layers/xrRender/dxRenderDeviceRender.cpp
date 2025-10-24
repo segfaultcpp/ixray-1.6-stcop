@@ -7,13 +7,12 @@
 
 #include "ResourceManager.h"
 #ifndef _EDITOR
-#include "imgui.h"
-#endif
-
-#ifdef USE_DX11
-#include "imgui_impl_dx11.h"
-#else
-#include "../xrRenderDX9/imgui_impl_dx9.h"
+#	include "imgui.h
+#	ifdef USE_DX11
+#		include "imgui_impl_dx11.h"
+#	else
+#		include "../xrRenderDX9/imgui_impl_dx9.h"
+#	endif
 #endif
 
 dxRenderDeviceRender::dxRenderDeviceRender()

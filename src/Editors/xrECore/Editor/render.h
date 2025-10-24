@@ -217,7 +217,8 @@ public:
 	virtual void			rmFar();
 	virtual void			rmNormal();
 
-	IC void apply_lmaterial() {
+	IC void apply_lmaterial()
+	{
 		R_constant* C = &*RCache.get_c("s_base"); // get sampler
 		if(0 == C)			return;
 		VERIFY(RC_dest_sampler == C->destination);
@@ -237,7 +238,7 @@ public:
 	}
 
 
-	virtual IDirect3DBaseTexture9* texture_load(LPCSTR	fname, u32& mem_size);
+	virtual IRHISurface* texture_load(LPCSTR fname, u32& msize, bool bStaging = false);
 
 	virtual DWORD					get_dx_level();
 
@@ -245,15 +246,12 @@ public:
 	virtual	void					create();
 	virtual	void					destroy();
 
-		virtual	void					level_Load(IReader*);
+	virtual	void					level_Load(IReader*);
 	virtual void					level_Unload();
-
-	//virtual IDirect3DBaseTexture9*	texture_load			(LPCSTR	fname, u32& msize)					= 0;
 
 	// Information
 	virtual	void					Statistics(CGameFont* F) {};
 
-	//	virtual ref_shader				getShader				(int id)									= 0;
 	virtual IRender_Sector* getSector(int id);
 	virtual IRenderVisual* getVisual(int id);
 	virtual IRender_Sector* detectSector(const Fvector& P);

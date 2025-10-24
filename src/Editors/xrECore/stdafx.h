@@ -7,6 +7,7 @@
 #include <d3d11shader.h>
 #include "../xrEUI/stdafx.h"
 #include "../../Layers/xrRenderDX10/DXCommonTypes.h"
+#include "../../Layers/xrRender/r__types.h"
 
 #include "../../utils/xrDXT/xrDXT.h"
 

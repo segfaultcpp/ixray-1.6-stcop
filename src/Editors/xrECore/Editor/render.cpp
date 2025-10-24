@@ -575,11 +575,6 @@ void CRender::level_Unload()
 
 }
 
-// IDirect3DBaseTexture9*	texture_load			(LPCSTR	fname, u32& msize)					= 0;
-
-
-
-//	 ref_shader				getShader				(int id)									= 0;
 IRender_Sector* CRender::getSector(int id)
 {
 	return nullptr;
@@ -726,59 +721,146 @@ public:
 	}
 };
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result)
-{
-	HRESULT _result = E_FAIL;
-	if (pTarget[0] == 'p')
-	{
+
+template <typename T>
+static HRESULT create_shader(
+	LPCSTR const pTarget,
+	DWORD const* buffer,
+	u32	const buffer_size,
+	LPCSTR const file_name,
+	T*& result
+) {
+	result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
+
+	ID3DShaderReflection* pReflection = 0;
+
+	HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+	if (SUCCEEDED(_hr) && pReflection) {
+		// Parse constant table data
+		result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
+
+		_RELEASE(pReflection);
+	}
+	else {
+		Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+	}
+
+	return _hr;
+}
+
+static HRESULT create_shader(
+	LPCSTR const pTarget,
+	DWORD const* buffer,
+	u32	const buffer_size,
+	LPCSTR const file_name,
+	void*& result
+) {
+	HRESULT		_result = E_FAIL;
+	if (pTarget[0] == 'p') {
 		SPS* sps_result = (SPS*)result;
-		_result = RDevice->CreatePixelShader(buffer, &sps_result->ps);
+		_result = RDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->ps);
 		if (!SUCCEEDED(_result)) {
 			Msg("! PS: %s", file_name);
 			Msg("! CreatePixelShader hr == 0x%08x", _result);
 			return		E_FAIL;
 		}
 
-		LPCVOID			data = nullptr;
-		_result = D3D9FindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-		if (SUCCEEDED(_result) && data)
-		{
-			LPD3DXSHADER_CONSTANTTABLE	pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-			sps_result->constants.parse(pConstants, 0x1);
+		ID3DShaderReflection* pReflection = 0;
+
+		_result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+
+		//	Parse constant, texture, sampler binding
+		//	Store input signature blob
+		if (SUCCEEDED(_result) && pReflection) {
+			//	Let constant table parse it's data
+			sps_result->constants.parse(pReflection, RC_dest_pixel);
+
+			_RELEASE(pReflection);
 		}
-		else
-		{
+		else {
 			Msg("! PS: %s", file_name);
+			Msg("! D3DReflectShader hr == 0x%08x", _result);
+		}
+	}
+	else if (pTarget[0] == 'v') {
+		SVS* svs_result = (SVS*)result;
+		_result = RDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->vs);
+
+		if (!SUCCEEDED(_result)) {
+			Msg("! VS: %s", file_name);
+			Msg("! CreatePixelShader hr == 0x%08x", _result);
+			return		E_FAIL;
+		}
+
+		ID3DShaderReflection* pReflection = 0;
+		_result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+
+		//	Parse constant, texture, sampler binding
+		//	Store input signature blob
+		if (SUCCEEDED(_result) && pReflection) {
+			//	TODO: DX10: share the same input signatures
+
+			//	Store input signature (need only for VS)
+			//CHK_DX( D3DxxGetInputSignatureBlob(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(), &_vs->signature) );
+			ID3DBlob* pSignatureBlob;
+			CHK_DX(D3DGetInputSignatureBlob(buffer, buffer_size, &pSignatureBlob));
+			VERIFY(pSignatureBlob);
+
+			svs_result->signature = DEV->_CreateInputSignature(pSignatureBlob);
+
+			_RELEASE(pSignatureBlob);
+
+			//	Let constant table parse it's data
+			svs_result->constants.parse(pReflection, RC_dest_vertex);
+
+			_RELEASE(pReflection);
+		}
+		else {
+			Msg("! VS: %s", file_name);
 			Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
 		}
 	}
-	else
-	{
-		SVS* svs_result = (SVS*)result;
-		_result = RDevice->CreateVertexShader(buffer, &svs_result->vs);
+	else if (pTarget[0] == 'g') {
+		SGS* sgs_result = (SGS*)result;
+		_result = RDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->gs);
 		if (!SUCCEEDED(_result)) {
-			Msg("! VS: %s", file_name);
-			Msg("! CreatePixelShader hr == 0x%08x", _result);
+			Msg("! GS: %s", file_name);
+			Msg("! CreateGeometryShaderhr == 0x%08x", _result);
 			return		E_FAIL;
 		}
 
-		LPCVOID			data = nullptr;
-		_result = D3D9FindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-		if (SUCCEEDED(_result) && data)
-		{
-			LPD3DXSHADER_CONSTANTTABLE	pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-			svs_result->constants.parse(pConstants, 0x2);
+		ID3DShaderReflection* pReflection = 0;
+
+		_result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+
+		//	Parse constant, texture, sampler binding
+		//	Store input signature blob
+		if (SUCCEEDED(_result) && pReflection) {
+			//	Let constant table parse it's data
+			sgs_result->constants.parse(pReflection, RC_dest_geometry);
+
+			_RELEASE(pReflection);
 		}
-		else
-		{
-			Msg("! VS: %s", file_name);
-			Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
+		else {
+			Msg("! PS: %s", file_name);
+			Msg("! D3DReflectShader hr == 0x%08x", _result);
 		}
+	}
+	else if (pTarget[0] == 'c') {
+		_result = create_shader(pTarget, buffer, buffer_size, file_name, (SCS*&)result);
+	}
+	else if (pTarget[0] == 'h') {
+		_result = create_shader(pTarget, buffer, buffer_size, file_name, (SHS*&)result);
+	}
+	else if (pTarget[0] == 'd') {
+		_result = create_shader(pTarget, buffer, buffer_size, file_name, (SDS*&)result);
+	}
+	else {
+		NODEFAULT;
 	}
 
 	return _result;
 }
-
 
 HRESULT	CRender::shader_compile(
 	LPCSTR							name,
@@ -930,35 +1012,43 @@ HRESULT	CRender::shader_compile(
 	return						_result;
 }
 
-void CBlender_accum::Compile(CBlender_Compile& C) {
+void CBlender_accum::Compile(CBlender_Compile& C)
+{
 	IBlender::Compile(C);
 
-	if(C.iElement == 0) {
+	if (C.iElement == 0)
+	{
 		C.r_Pass("accum_mask", "dumb", false, TRUE, FALSE);
 		C.r_End();
 
 		return;
 	}
 
-	if(C.iElement > 2) {
+	if (C.iElement > 2)
+	{
 		return;
 	}
 
-	if(C.iElement == 1) {
+	if (C.iElement == 1)
+	{
 		RImplementation.addShaderOption("USE_LMAP", "1");
 	}
 
 	C.r_Pass("accum_volume", "accum_base", false, FALSE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
 
-	C.r_Sampler_rtf("s_base", "$user$diffuse");
-	C.r_Sampler_rtf("s_position", "$user$position");
-	C.r_Sampler_rtf("s_normal", "$user$normal");
+	C.r_dx10Texture("s_base", "$user$diffuse");
+	C.r_dx10Texture("s_position", "$user$position");
+	C.r_dx10Texture("s_normal", "$user$normal");
 
-	C.r_Sampler_clw("s_material", "shaders\\r2_material");
+	C.r_dx10Texture("s_material", "shaders\\r2_material");
 
-	if(C.iElement == 1) {
-		C.r_Sampler_clf("s_lmap", *C.L_textures[0]);
+	if (C.iElement == 1)
+	{
+		C.r_dx10Texture("s_lmap", *C.L_textures[0]);
 	}
 
+	C.r_dx10Sampler("smp_rtlinear");
+	C.r_dx10Sampler("smp_material");
+	C.r_dx10Sampler("smp_nofilter");
 	C.r_End();
 }

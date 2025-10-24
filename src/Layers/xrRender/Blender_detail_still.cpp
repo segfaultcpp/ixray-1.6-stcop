@@ -111,32 +111,40 @@ void CBlender_Detail_Still::Compile	(CBlender_Compile& C)
 // R3
 //////////////////////////////////////////////////////////////////////////
 #include "uber_deffer.h"
-void CBlender_Detail_Still::Compile	(CBlender_Compile& C)
+void CBlender_Detail_Still::Compile(CBlender_Compile& C)
 {
-	IBlender::Compile	(C);
+	IBlender::Compile(C);
 
-	if(C.iElement == SE_R2_DETAIL_SHADOW_HQ || C.iElement == SE_R2_DETAIL_SHADOW_LQ) {
+	if (C.bEditor)
+	{
+		uber_deffer(C, false, "deffer_detail", "deffer_base", true, 0, true);
+		C.r_End();
+		return;
+	}
+
+	if (C.iElement == SE_R2_DETAIL_SHADOW_HQ || C.iElement == SE_R2_DETAIL_SHADOW_LQ)
+	{
 		RImplementation.addShaderOption("DETAIL_SHADOW_PASS", "1");
 	}
 
-	switch(C.iElement)
+	switch (C.iElement)
 	{
 	case SE_R2_NORMAL_HQ:
 	case SE_R2_DETAIL_SHADOW_HQ:
 		RImplementation.addShaderOption("USE_TREEWAVE", "1");
-		uber_deffer		(C,false,"deffer_detail","deffer_base",true, 0, true);
-		C.r_Stencil		( TRUE,D3DCMP_ALWAYS,0xff,0x7f,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-		C.r_StencilRef	(0x01);
-		C.r_CullMode	(D3DCULL_NONE);
-		C.r_End			();
+		uber_deffer(C, false, "deffer_detail", "deffer_base", true, 0, true);
+		C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+		C.r_StencilRef(0x01);
+		C.r_CullMode(D3DCULL_NONE);
+		C.r_End();
 		break;
 	case SE_R2_NORMAL_LQ:
 	case SE_R2_DETAIL_SHADOW_LQ:
-		uber_deffer		(C,false,"deffer_detail","deffer_base",true, 0, true);
-		C.r_Stencil		( TRUE,D3DCMP_ALWAYS,0xff,0x7f,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-		C.r_StencilRef	(0x01);
-		C.r_CullMode	(D3DCULL_NONE);
-		C.r_End			();
+		uber_deffer(C, false, "deffer_detail", "deffer_base", true, 0, true);
+		C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+		C.r_StencilRef(0x01);
+		C.r_CullMode(D3DCULL_NONE);
+		C.r_End();
 		break;
 	}
 
